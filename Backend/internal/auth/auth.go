@@ -11,8 +11,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
 
-	// ...existing code...
-	// "github.com/jatinfoujdar/Blog-App/internal/auth"
+
 	"github.com/jatinfoujdar/Blog-App/internal/auth/model"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -115,7 +114,7 @@ func (r *UserRepository) ComparePassword(user *model.User, password string) erro
 	return bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
 }
 
-func RegisterHandler(repo *auth.UserRepository) gin.HandlerFunc {
+func RegisterHandler(repo *UserRepository) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var user model.User
 		if err := c.ShouldBindJSON(&user); err != nil {
@@ -130,7 +129,7 @@ func RegisterHandler(repo *auth.UserRepository) gin.HandlerFunc {
 	}
 }
 
-func LoginHandler(repo *auth.UserRepository) gin.HandlerFunc {
+func LoginHandler(repo *UserRepository) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var req struct {
 			Email    string `json:"email" binding:"required,email"`
