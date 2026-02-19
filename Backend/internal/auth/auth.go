@@ -5,6 +5,9 @@ import (
 	"errors"
 	"time"
 
+	"os"
+
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/jatinfoujdar/Blog-App/internal/auth/model"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -12,16 +15,45 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+var jwtSecret = []byte(os.Getenv("JWT_SECRET"))
+
+type Claims struct {
+	Email string `json:"email"`
+	jwt.RegisteredClaims
+}
+
+func GenerateJWT(email string) (string, error) {
+	claims := &Claims{
+		Email: email,
+		RegisteredClaims: jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * time.Hour)),
+		},
+	}
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	return token.SignedString(jwtSecret)
+}
+
+func ValidateJWT(tokenString string) (*Claims, error) {
+	token, err := jwt.ParseWithClaims(tokenString, &Claims{}, func(token *jwt.Token) (interface{}, error) {
+		return jwtSecret, nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	claims, ok := token.Claims.(*Claims)
+	if !ok || !token.Valid {
+		return nil, errors.New("invalid token")
+	}
+	return claims, nil
+}
 
 type UserRepository struct {
 	collection *mongo.Collection
 }
 
-
 func NewUserRepository(collection *mongo.Collection) (*UserRepository, error) {
 	repo := &UserRepository{collection: collection}
 
-	
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
@@ -37,23 +69,19 @@ func NewUserRepository(collection *mongo.Collection) (*UserRepository, error) {
 	return repo, nil
 }
 
-
 func (r *UserRepository) CreateUser(user *model.User) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
 	if err != nil {
 		return err
 	}
 	user.Password = string(hashedPassword)
 
-	
 	now := time.Now()
 	user.CreatedAt = now
 	user.UpdatedAt = now
-
 
 	_, err = r.collection.InsertOne(ctx, user)
 	if mongo.IsDuplicateKeyError(err) {
@@ -62,7 +90,6 @@ func (r *UserRepository) CreateUser(user *model.User) error {
 
 	return err
 }
-
 
 func (r *UserRepository) GetUserByEmail(email string) (*model.User, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
@@ -78,7 +105,6 @@ func (r *UserRepository) GetUserByEmail(email string) (*model.User, error) {
 
 	return &user, nil
 }
-
 
 func (r *UserRepository) ComparePassword(user *model.User, password string) error {
 	return bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
