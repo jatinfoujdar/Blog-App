@@ -32,5 +32,88 @@ class APIService {
         }
     }
     
+    func signup(request: SignupRequest , completion: @escaping(Result<AuthResponse, Error>) -> Void
+    ){
+        guard let url = URL(string: "\(baseURL)/signup")else{
+            completion(.failure(NetworkError.invalidURL))
+            return
+        }
+        
+        var urlRequest = URLRequest(url: url)
+        urlRequest.httpMethod = "POST"
+        urlRequest.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        
+        do{
+            urlRequest.httpBody = try JSONEncoder().encode(request)
+        }catch{
+            completion(.failure(error))
+            return
+        }
+        
+        URLSession.shared.dataTask(with: urlRequest){data, res , err in
+            
+            if let err = err {
+                completion(.failure(err))
+                return
+            }
+            guard let data = data else{
+                completion(.failure(NetworkError.noData))
+                return
+            }
+            
+            do{
+                let authResponse = try JSONDecoder().decode(AuthResponse.self, from: data)
+                if let errMsg = authResponse.error{
+                    completion(.failure(NetworkError.serverError(errMsg)))
+                }else{
+                    completion(.success(authResponse))
+                }
+            }catch{
+                completion(.failure(NetworkError.decodingError))
+            }
+        }.resume()
+    }
+    
+    
+    func login(request: LoginRequest, completion: @escaping (Result<AuthResponse, Error>) -> Void) {
+            guard let url = URL(string: "\(baseURL)/login") else {
+                completion(.failure(NetworkError.invalidURL))
+                return
+            }
+            
+            var urlRequest = URLRequest(url: url)
+            urlRequest.httpMethod = "POST"
+            urlRequest.setValue("application/json", forHTTPHeaderField: "Content-Type")
+            
+            do {
+                urlRequest.httpBody = try JSONEncoder().encode(request)
+            } catch {
+                completion(.failure(error))
+                return
+            }
+            
+            URLSession.shared.dataTask(with: urlRequest) { data, response, error in
+                if let error = error {
+                    completion(.failure(error))
+                    return
+                }
+                
+                guard let data = data else {
+                    completion(.failure(NetworkError.noData))
+                    return
+                }
+                
+                do {
+                    let authResponse = try JSONDecoder().decode(AuthResponse.self, from: data)
+                    if let errorMsg = authResponse.error {
+                        completion(.failure(NetworkError.serverError(errorMsg)))
+                    } else {
+                        completion(.success(authResponse))
+                    }
+                } catch {
+                    completion(.failure(NetworkError.decodingError))
+                }
+            }.resume()
+        }
 }
 
