@@ -20,4 +20,9 @@ struct AuthResponse: Decodable {
     let token: String?
     let message: String?
     let error: String?
+    
+    
+    enum CodingKeys: String, CodingKey {
+        case message, token, error
+    }
 }
