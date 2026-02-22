@@ -39,13 +39,13 @@ class loginViewController : UIViewController{
         let textField = UITextField()
         textField.placeholder = "Password"
         textField.borderStyle = .roundedRect
-        textField.isUserInteractionEnabled = true
+        textField.isSecureTextEntry = true
         
         textField.translatesAutoresizingMaskIntoConstraints = false
         return textField
     }()
     
-    private let logininButton : UIButton = {
+    private let loginButton : UIButton = {
         
         let button = UIButton()
         button.setTitle("Login", for: .normal)
@@ -60,17 +60,26 @@ class loginViewController : UIViewController{
     
     
     override func viewDidLoad(){
-        
-        view.backgroundColor = .systemBackground
-        
+        super.viewDidLoad()
+        setupView()
+        SetupUI()
+        setupConstraints()
+//        setupActions()
     }
     
     
     private func SetupUI(){
         
+        view.addSubview(titleLabel)
         view.addSubview(emailTextField)
         view.addSubview(passwordTextField)
-        view.addSubview(logininButton)
+        view.addSubview(loginButton)
+    }
+    
+    
+    private func setupView(){
+        view.backgroundColor = .systemBackground
+        title = "Login"
     }
 
     private func setupConstraints() {
@@ -78,10 +87,10 @@ class loginViewController : UIViewController{
         NSLayoutConstraint.activate([
             
             titleLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 30),
-            titleLabel.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor, constant: 20),
-            titleLabel.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -20),
+            titleLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+            titleLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
             
-    
+            
             // Email Field
             emailTextField.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 16),
             emailTextField.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
@@ -95,10 +104,29 @@ class loginViewController : UIViewController{
             passwordTextField.heightAnchor.constraint(equalToConstant: 44),
             
             // Login Button
-            logininButton.topAnchor.constraint(equalTo: passwordTextField.bottomAnchor, constant: 30),
-            logininButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
-            logininButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
-            logininButton.heightAnchor.constraint(equalToConstant: 50)
+            loginButton.topAnchor.constraint(equalTo: passwordTextField.bottomAnchor, constant: 30),
+            loginButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+            loginButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+            loginButton.heightAnchor.constraint(equalToConstant: 50)
         ])
+    }
+    
+    private func setupActions(){
+        loginButton.addTarget(self, action: #selector(handleLogin), for: .touchUpInside)
+    }
+    
+    @objc private func handleLogin(){
+        view.endEditing(true)
+        
+        guard let email = emailTextField.text, !email.isEmpty,
+              let password = passwordTextField.text, !password.isEmpty else {
+              showAlert(title: "Error", message: "Please fill all fields")
+              return
+        }
+    }
+    private func showAlert(title: String, message: String){
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "OK", style: .default))
+        present(alert, animated: true)
     }
 }
