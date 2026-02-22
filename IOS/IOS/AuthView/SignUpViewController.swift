@@ -48,7 +48,7 @@ class SignUpViewController: UIViewController {
         let textField = UITextField()
         textField.placeholder = "Password"
         textField.borderStyle = .roundedRect
-        textField.isUserInteractionEnabled = true
+        textField.isSecureTextEntry = true
         
         textField.translatesAutoresizingMaskIntoConstraints = false
         return textField
@@ -70,8 +70,16 @@ class SignUpViewController: UIViewController {
     
     override func viewDidLoad(){
         
+        super.viewDidLoad()
+        setupView()
+        SetupUI()
+        setupConstraints()
+        setupActions()
+    }
+    
+    private func setupView(){
         view.backgroundColor = .systemBackground
-        
+        title = "Sign Up"
     }
     
     
@@ -89,8 +97,8 @@ class SignUpViewController: UIViewController {
         NSLayoutConstraint.activate([
             
             titleLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 30),
-            titleLabel.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor, constant: 20),
-            titleLabel.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -20),
+            titleLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+            titleLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
             
             nameTextField.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 30),
             nameTextField.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
@@ -116,5 +124,30 @@ class SignUpViewController: UIViewController {
             signupButton.heightAnchor.constraint(equalToConstant: 50)
         ])
     }
+    
+    
+    private func setupActions(){
+        signupButton.addTarget(self, action: #selector(handleSignup), for: .touchUpInside)
+    }
+    
+    
+    @objc private func handleSignup(){
+    
+        view.endEditing(true)
+        
+        guard let name = nameTextField.text, !name.isEmpty,
+              let email = emailTextField.text, !email.isEmpty,
+              let password = passwordTextField.text, !password.isEmpty else{
+              showAlert(title: "error", message: "Please fill in all field")
+            return
+        }
+        
+    }
+    private func showAlert(title: String, message: String){
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "OK", style: .default))
+        present(alert, animated: true)
+    }
+    
 }
 
