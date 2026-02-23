@@ -64,7 +64,7 @@ class loginViewController : UIViewController{
         setupView()
         SetupUI()
         setupConstraints()
-//        setupActions()
+        setupActions()
     }
     
     
