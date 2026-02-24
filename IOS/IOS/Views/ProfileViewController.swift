@@ -2,203 +2,170 @@ import UIKit
 
 class ProfileViewController: UIViewController {
     
-    private let nameTextField = UITextField()
-    private let roleTextField = UITextField()
-    
-    
-    private let addButton = UIButton()
-    
-    private let containerView = UIView()
-    private let scrollView = UIScrollView()
-    private let stackView = UIStackView()
-    
-    
-    private let socialsPlatforms = [
-      "Github",
-      "Linkedin",
-      "Twitter",
-      "Website"
-    ]
-    
-    private var socialTextFields: [UITextField] = []
-    
-    private var socialsLabel: UILabel = {
-        
+    private let nameLabel: UILabel = {
         let label = UILabel()
-        label.text = "Socials"
-        label.textColor = .black
-        label.font = .boldSystemFont(ofSize: 20)
+        label.text = "Name"
+        label.widthAnchor.constraint(equalToConstant: 100).isActive = true
+        label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
     
+    private let nameTextField: UITextField = {
+        let textField = UITextField()
+        textField.placeholder = "Enter your name"
+        textField.borderStyle = .roundedRect
+        textField.translatesAutoresizingMaskIntoConstraints = false
+        return textField
+    }()
     
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        view.backgroundColor = .gray
-        setupContainer()
-        setupScrollView()
-        setupStackView()
-        setupName()
-        setupRole()
-        setupSocials()
-        setupButton()
-    }
+    private let roleLabel: UILabel = {
+        let label = UILabel()
+        label.text = "Role"
+        label.widthAnchor.constraint(equalToConstant: 100).isActive = true
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
     
-    private func setupContainer(){
-        
-        containerView.backgroundColor = .white
-        containerView.layer.cornerRadius = 10
-        containerView.layer.shadowColor = UIColor.black.cgColor
-        containerView.layer.shadowRadius = 10
-        containerView.layer.shadowOpacity = 0.5
-        containerView.layer.shadowOffset = .zero
-        
-        
-        containerView.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(containerView)
-        
-        
-        NSLayoutConstraint.activate([
-               containerView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 40),
-               containerView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
-               containerView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
-               containerView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -40)
-           ])
-        
-    }
+    private let roleTextField: UITextField = {
+        let textField = UITextField()
+        textField.placeholder = "Enter your role"
+        textField.borderStyle = .roundedRect
+        textField.translatesAutoresizingMaskIntoConstraints = false
+        return textField
+    }()
     
-    private func setupScrollView(){
-        
+    private let socialLabel: UILabel = {
+        let label = UILabel()
+        label.text = "Social"
+        label.widthAnchor.constraint(equalToConstant: 100).isActive = true
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    
+    private let githubTextField: UITextField = {
+        let textField = UITextField()
+        textField.placeholder = "Enter your github"
+        textField.borderStyle = .roundedRect
+        textField.translatesAutoresizingMaskIntoConstraints = false
+        return textField
+    }()
+    
+    private let linkedinTextField: UITextField = {
+        let textField = UITextField()
+        textField.placeholder = "Enter your linkedin"
+        textField.borderStyle = .roundedRect
+        textField.translatesAutoresizingMaskIntoConstraints = false
+        return textField
+    }()
+    
+    private let twitterTextField: UITextField = {
+        let textField = UITextField()
+        textField.placeholder = "Enter your twitter"
+        textField.borderStyle = .roundedRect
+        textField.translatesAutoresizingMaskIntoConstraints = false
+        return textField
+    }()
+    
+    private let websiteTextField: UITextField = {
+        let textField = UITextField()
+        textField.placeholder = "Enter your website"
+        textField.borderStyle = .roundedRect
+        textField.translatesAutoresizingMaskIntoConstraints = false
+        return textField
+    }()
+    
+    private let addButton: UIButton = {
+        let button = UIButton()
+        button.setTitle("Add", for: .normal)
+        button.backgroundColor = .systemBlue
+        button.setTitleColor(.white, for: .normal)
+        button.layer.cornerRadius = 8
+        button.translatesAutoresizingMaskIntoConstraints = false
+        return button
+    }()
+    
+    private let containerView: UIView = {
+        let view = UIView()
+        view.backgroundColor = .white
+        view.layer.cornerRadius = 8
+        view.layer.shadowColor = UIColor.black.cgColor
+        view.layer.shadowRadius = 8
+        view.layer.shadowOpacity = 0.5
+        view.layer.shadowOffset = .zero
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
+    
+    private let scrollView: UIScrollView = {
+        let scrollView = UIScrollView()
         scrollView.translatesAutoresizingMaskIntoConstraints = false
-        containerView.addSubview(scrollView)
-        
-        
-        NSLayoutConstraint.activate([
-            scrollView.topAnchor.constraint(equalTo: containerView.topAnchor),
-            scrollView.bottomAnchor.constraint(equalTo: containerView.bottomAnchor),
-            scrollView.leadingAnchor.constraint(equalTo: containerView.leadingAnchor),
-            scrollView.trailingAnchor.constraint(equalTo: containerView.trailingAnchor)
-        ])
-    }
+        return scrollView
+    }()
     
-    private func setupStackView(){
-        
+    private let contentStackView: UIStackView = {
+        let stackView = UIStackView()
         stackView.axis = .vertical
         stackView.spacing = 16
         stackView.translatesAutoresizingMaskIntoConstraints = false
-        
-        
-        scrollView.addSubview(stackView)
-        
-        NSLayoutConstraint.activate([
-              stackView.topAnchor.constraint(equalTo: scrollView.contentLayoutGuide.topAnchor, constant: 16),
-              stackView.bottomAnchor.constraint(equalTo: scrollView.contentLayoutGuide.bottomAnchor, constant: -16),
-              stackView.leadingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.leadingAnchor, constant: 16),
-              stackView.trailingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.trailingAnchor, constant: -16),
-              
-              stackView.widthAnchor.constraint(equalTo: scrollView.frameLayoutGuide.widthAnchor, constant: -32)
-          ])
+        return stackView
+    }()
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+//        setupView()
+//        SetupUI()
+//        setupConstraints()
+//        setupActions()
     }
     
-    private func setupName(){
-        
-        let horizontalStack = UIStackView()
-        horizontalStack.axis = .horizontal
-        horizontalStack.spacing = 8
-        horizontalStack.alignment = .center
-        
-        
-        let label = UILabel()
-        label.text = "Name:"
-        label.widthAnchor.constraint(equalToConstant: 100).isActive = true
-        
-        nameTextField.placeholder = "Enter the name"
-        nameTextField.borderStyle = .roundedRect
-        
-        
-        horizontalStack.addArrangedSubview(label)
-        horizontalStack.addArrangedSubview(nameTextField)
-        
-        stackView.addArrangedSubview(horizontalStack)
+    private func setupView(){
+        view.backgroundColor = .systemBackground
+        title = "Profile"
     }
     
-    private func setupRole(){
+    private func setupUI(){
+        view.addSubview(containerView)
+        containerView.addSubview(scrollView)
+        scrollView.addSubview(contentStackView)
         
-        let horizontalStack = UIStackView()
-        horizontalStack.axis = .horizontal
-        horizontalStack.spacing = 8
-        horizontalStack.alignment = .center
+        let nameStack = createHorizontalStack(nameLabel, nameTextField)
+        let roleStack = createHorizontalStack(roleLabel, roleTextField)
         
-        
-        let label = UILabel()
-        label.text = "Role:"
-        label.widthAnchor.constraint(equalToConstant: 100).isActive = true
-        
-        roleTextField.placeholder = "Enter you role"
-        roleTextField.borderStyle = .roundedRect
-        
-        
-        horizontalStack.addArrangedSubview(label)
-        horizontalStack.addArrangedSubview(roleTextField)
-        
-        stackView.addArrangedSubview(horizontalStack)
-    }
-    
-    private func setupButton(){
-        
-        addButton.setTitle("Add", for: .normal)
-        addButton.setTitleColor(.white, for: .normal)
-        addButton.backgroundColor = .systemBlue
-        addButton.layer.cornerRadius = 8
-        addButton.translatesAutoresizingMaskIntoConstraints = false
-        
-        
-        stackView.addSubview(addButton)
-        
-        NSLayoutConstraint.activate([
-            addButton.topAnchor.constraint(equalTo: stackView.bottomAnchor, constant: 20),
-            addButton.leadingAnchor.constraint(equalTo: stackView.leadingAnchor, constant: 20),
-            addButton.trailingAnchor.constraint(equalTo: stackView.trailingAnchor, constant: -20),
-            ])
+        contentStackView.addArrangedSubview(nameStack)
+        contentStackView.addArrangedSubview(roleStack)
+        contentStackView.addArrangedSubview(socialLabel)
+        contentStackView.addArrangedSubview(githubTextField)
+        contentStackView.addArrangedSubview(linkedinTextField)
+        contentStackView.addArrangedSubview(twitterTextField)
+        contentStackView.addArrangedSubview(websiteTextField)
+        contentStackView.addArrangedSubview(addButton)
         
     }
     
-    
- 
-    private func setupSocials() {
-        stackView.addArrangedSubview(socialsLabel)
-        
-        
-        for platform in socialsPlatforms{
-            
-            let horizontalStack = UIStackView()
-            horizontalStack.axis = .horizontal
-            horizontalStack.alignment = .leading
-            
-            
-            let label = UILabel()
-            label.text = "\(platform):"
-            label.widthAnchor.constraint(equalToConstant: 100).isActive = true
-            
-            
-            let textField = UITextField()
-            textField.placeholder = "Enter \(platform) URL"
-            textField.borderStyle = .roundedRect
-            textField.autocapitalizationType = .none
-            textField.keyboardType = .URL
-            
-            
-            socialTextFields.append(textField)
-            
-            horizontalStack.addArrangedSubview(label)
-            horizontalStack.addArrangedSubview(textField)
-            
-            stackView.addArrangedSubview(horizontalStack)
-        }
+    private func setupActions(){
+        addButton.addTarget(self, action: #selector(addTapped), for: .touchUpInside)
     }
-
-  
-
     
+    @objc private func addTapped(){
+        let profile = Profile(
+            name: nameTextField.text ?? "",
+            role: roleTextField.text ?? "",
+            github: githubTextField.text ,
+            linkedin: linkedinTextField.text ,
+            twitter: twitterTextField.text ,
+            website: websiteTextField.text
+    )
+        print(profile)
+        print(profile.socialLinks)
+    }
+    
+    
+    private func createHorizontalStack(_ views: UIView...) -> UIStackView{
+        let stack = UIStackView(arrangedSubviews: views)
+        stack.axis = .horizontal
+        stack.spacing = 16
+        stack.alignment = .center
+        return stack
+    }
     
 }
