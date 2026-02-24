@@ -119,6 +119,32 @@ func (r *UserRepository) ComparePassword(user *model.User, password string) erro
 	return bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
 }
 
+func (r *UserRepository) UpdateUser(email string, updateData map[string]interface{}) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	delete(updateData, "email") // Prevent email from being updated via this method
+	delete(updateData, "password")
+	delete(updateData, "id")
+
+	updateData["updated_at"] = time.Now()
+
+	update := bson.M{
+		"$set": updateData,
+	}
+
+	result, err := r.collection.UpdateOne(ctx, bson.M{"email": email}, update)
+	if err != nil {
+		return err
+	}
+
+	if result.MatchedCount == 0 {
+		return errors.New("user not found")
+	}
+
+	return nil
+}
+
 func RegisterHandler(repo *UserRepository) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var user model.User
@@ -159,5 +185,28 @@ func LoginHandler(repo *UserRepository) gin.HandlerFunc {
 			return
 		}
 		c.JSON(http.StatusOK, gin.H{"token": token})
+	}
+}
+
+func UpdateProfileHandler(repo *UserRepository) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		email, exists := c.Get("userEmail")
+		if !exists {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "user email not found in context"})
+			return
+		}
+
+		var updateData map[string]interface{}
+		if err := c.ShouldBindJSON(&updateData); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+
+		if err := repo.UpdateUser(email.(string), updateData); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{"message": "profile updated successfully"})
 	}
 }
