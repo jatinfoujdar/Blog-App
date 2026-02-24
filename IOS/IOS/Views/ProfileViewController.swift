@@ -112,10 +112,10 @@ class ProfileViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-//        setupView()
-//        SetupUI()
-//        setupConstraints()
-//        setupActions()
+        setupView()
+        setupUI()
+        setupConstraints()
+        setupActions()
     }
     
     private func setupView(){
@@ -139,7 +139,29 @@ class ProfileViewController: UIViewController {
         contentStackView.addArrangedSubview(twitterTextField)
         contentStackView.addArrangedSubview(websiteTextField)
         contentStackView.addArrangedSubview(addButton)
-        
+    }
+
+    private func setupConstraints() {
+        NSLayoutConstraint.activate([
+            // Container View
+            containerView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
+            containerView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+            containerView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+            containerView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -20),
+            
+            // Scroll View
+            scrollView.topAnchor.constraint(equalTo: containerView.topAnchor),
+            scrollView.leadingAnchor.constraint(equalTo: containerView.leadingAnchor),
+            scrollView.trailingAnchor.constraint(equalTo: containerView.trailingAnchor),
+            scrollView.bottomAnchor.constraint(equalTo: containerView.bottomAnchor),
+            
+            // Content Stack View
+            contentStackView.topAnchor.constraint(equalTo: scrollView.contentLayoutGuide.topAnchor, constant: 20),
+            contentStackView.leadingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.leadingAnchor, constant: 20),
+            contentStackView.trailingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.trailingAnchor, constant: -20),
+            contentStackView.bottomAnchor.constraint(equalTo: scrollView.contentLayoutGuide.bottomAnchor, constant: -20),
+            contentStackView.widthAnchor.constraint(equalTo: scrollView.frameLayoutGuide.widthAnchor, constant: -40)
+        ])
     }
     
     private func setupActions(){
