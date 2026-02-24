@@ -10,7 +10,7 @@ import Foundation
 class APIService {
     
     static let shared = APIService()
-    private let baseURL = "http://localhost:1080"
+    private let baseURL = "http://localhost:8080"
     
     private init() {}
     
@@ -76,44 +76,99 @@ class APIService {
     
     
     func login(request: LoginRequest, completion: @escaping (Result<AuthResponse, Error>) -> Void) {
-            guard let url = URL(string: "\(baseURL)/login") else {
-                completion(.failure(NetworkError.invalidURL))
-                return
-            }
-            
-            var urlRequest = URLRequest(url: url)
-            urlRequest.httpMethod = "POST"
-            urlRequest.setValue("application/json", forHTTPHeaderField: "Content-Type")
-            
-            do {
-                urlRequest.httpBody = try JSONEncoder().encode(request)
-            } catch {
+        guard let url = URL(string: "\(baseURL)/login") else {
+            completion(.failure(NetworkError.invalidURL))
+            return
+        }
+        
+        var urlRequest = URLRequest(url: url)
+        urlRequest.httpMethod = "POST"
+        urlRequest.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        
+        do {
+            urlRequest.httpBody = try JSONEncoder().encode(request)
+        } catch {
+            completion(.failure(error))
+            return
+        }
+        
+        URLSession.shared.dataTask(with: urlRequest) { data, response, error in
+            if let error = error {
                 completion(.failure(error))
                 return
             }
             
-            URLSession.shared.dataTask(with: urlRequest) { data, response, error in
-                if let error = error {
-                    completion(.failure(error))
-                    return
+            guard let data = data else {
+                completion(.failure(NetworkError.noData))
+                return
+            }
+            
+            do {
+                let authResponse = try JSONDecoder().decode(AuthResponse.self, from: data)
+                if let errorMsg = authResponse.error {
+                    completion(.failure(NetworkError.serverError(errorMsg)))
+                } else {
+                    completion(.success(authResponse))
                 }
-                
-                guard let data = data else {
-                    completion(.failure(NetworkError.noData))
-                    return
-                }
-                
-                do {
-                    let authResponse = try JSONDecoder().decode(AuthResponse.self, from: data)
-                    if let errorMsg = authResponse.error {
-                        completion(.failure(NetworkError.serverError(errorMsg)))
-                    } else {
-                        completion(.success(authResponse))
-                    }
-                } catch {
+            } catch {
+                completion(.failure(NetworkError.decodingError))
+            }
+        }.resume()
+    }
+    
+    
+    func updateProfile(
+        token: String,
+        profile: Profile,
+        completion: @escaping (Result<String, Error>) -> Void
+    ){
+        guard let url = URL(string: "\(baseURL)/profile")else{
+            completion(.failure(NetworkError.invalidURL))
+            return
+        }
+        
+        var urlRequest = URLRequest(url: url)
+        
+        urlRequest.httpMethod = "PUT"
+        
+        urlRequest.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        
+        urlRequest.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        
+        do{
+            urlRequest.httpBody = try JSONEncoder().encode(profile)
+        }catch{
+            completion(.failure(error))
+            return
+        }
+        
+        URLSession.shared.dataTask(with: urlRequest){data, res, error in
+            if let error = error{
+                completion(.failure(error))
+                return
+            }
+            guard let httpResponse = res as? HTTPURLResponse else{
+                completion(.failure(NetworkError.unknown))
+                return
+            }
+            
+            guard let data = data else{
+                completion(.failure(NetworkError.noData))
+                return
+            }
+            
+            if httpResponse.statusCode == 200{
+                do{
+                    let decoded = try JSONDecoder().decode(MessageResponse.self, from: data)
+                    completion(.success(decoded.message))
+                }catch{
                     completion(.failure(NetworkError.decodingError))
                 }
-            }.resume()
+            }else{
+                completion(.failure(NetworkError.serverError("Failed to update profile")))
+            }
         }
+        .resume()
+    }
 }
 

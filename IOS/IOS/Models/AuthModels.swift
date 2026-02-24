@@ -26,3 +26,8 @@ struct AuthResponse: Decodable {
         case message, token, error
     }
 }
+
+
+struct MessageResponse: Decodable {
+    let message: String
+}
