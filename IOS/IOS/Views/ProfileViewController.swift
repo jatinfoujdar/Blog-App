@@ -120,7 +120,7 @@ class ProfileViewController: UIViewController {
     
     private func setupView(){
         view.backgroundColor = .systemBackground
-        title = "Profile"
+        title = "🧍‍♂️Profile"
     }
     
     private func setupUI(){

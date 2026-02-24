@@ -8,7 +8,8 @@
 import Foundation
 
 
-struct Profile {
+struct Profile: Codable {
+    
     let name: String
     let role: String
     let github: String?
