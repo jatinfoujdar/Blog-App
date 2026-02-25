@@ -170,5 +170,20 @@ class APIService {
         }
         .resume()
     }
+    
+    
+    
+    private func authorizedRequest(url: URL) -> URLRequest? {
+        
+        guard let token = SessionManager.shared.getToken() else{
+            return nil
+        }
+        var req = URLRequest(url: url)
+        req.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        
+        req.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        
+        return req
+    }
 }
 
