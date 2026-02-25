@@ -118,57 +118,66 @@ class APIService {
     
     
     func updateProfile(
-        token: String,
         profile: Profile,
         completion: @escaping (Result<String, Error>) -> Void
-    ){
-        guard let url = URL(string: "\(baseURL)/profile")else{
+    ) {
+        // Create URL
+        guard let url = URL(string: "\(baseURL)/profile") else {
             completion(.failure(NetworkError.invalidURL))
             return
         }
         
-        var urlRequest = URLRequest(url: url)
+        // Create authorized request automatically
+        guard var request = authorizedRequest(url: url) else {
+            completion(.failure(NetworkError.serverError("User not logged in")))
+            return
+        }
         
-        urlRequest.httpMethod = "PUT"
+        request.httpMethod = "PUT"
         
-        urlRequest.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        
-        urlRequest.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
-        
-        do{
-            urlRequest.httpBody = try JSONEncoder().encode(profile)
-        }catch{
+        // Encode profile to JSON
+        do {
+            request.httpBody = try JSONEncoder().encode(profile)
+        } catch {
             completion(.failure(error))
             return
         }
         
-        URLSession.shared.dataTask(with: urlRequest){data, res, error in
-            if let error = error{
+        URLSession.shared.dataTask(with: request) { data, response, error in
+            
+            if let error = error {
                 completion(.failure(error))
                 return
             }
-            guard let httpResponse = res as? HTTPURLResponse else{
+            
+            guard let httpResponse = response as? HTTPURLResponse else {
                 completion(.failure(NetworkError.unknown))
                 return
             }
             
-            guard let data = data else{
+            if httpResponse.statusCode == 401 {
+                SessionManager.shared.logout()
+                completion(.failure(NetworkError.serverError("Session expired")))
+                return
+            }
+            
+            guard let data = data else {
                 completion(.failure(NetworkError.noData))
                 return
             }
             
-            if httpResponse.statusCode == 200{
-                do{
+            if httpResponse.statusCode == 200 {
+                do {
                     let decoded = try JSONDecoder().decode(MessageResponse.self, from: data)
                     completion(.success(decoded.message))
-                }catch{
+                } catch {
                     completion(.failure(NetworkError.decodingError))
                 }
-            }else{
+            } else {
                 completion(.failure(NetworkError.serverError("Failed to update profile")))
             }
-        }
-        .resume()
+            
+        }.resume()
     }
     
     
