@@ -123,7 +123,27 @@ class loginViewController : UIViewController{
               showAlert(title: "Error", message: "Please fill all fields")
               return
         }
+        
+        let loginRequest = LoginRequest(email: email, password: password)
+        
+        APIService.shared.login(request: loginRequest){ result in
+        
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let res):
+                    if let token = res.token{
+                        SessionManager.shared.saveToken(token)
+//                        self.
+                    }else{
+                        self.showAlert(title: "Error", message: "Invaild server")
+                    }
+                case .failure(let error):
+                    self.showAlert(title: "Login Failed", message: error.localizedDescription)
+                }
+            }
+        }
     }
+    
     private func showAlert(title: String, message: String){
         let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "OK", style: .default))
