@@ -151,7 +151,7 @@ class SignUpViewController: UIViewController {
                 case .success(let res):
                     if let token = res.token{
                         SessionManager.shared.saveToken(token)
-                        self.navigateToLogin()
+                        self.navigateToMainTab()
                     }else{
                         self.showAlert(title: "Error", message: "Invalid server")
                     }
@@ -168,16 +168,10 @@ class SignUpViewController: UIViewController {
         present(alert, animated: true)
     }
     
-    private func navigateToLogin(){
-        if let navigationController = self.navigationController{
-            let loginVC = LoginViewController()
-            navigationController.pushViewController(loginVC, animated: true)
-        }
-        else{
-            let loginVC = LoginViewController()
-            loginVC.modalPresentationStyle = .fullScreen
-            self.present(loginVC, animated: true)
-        }
+    private func navigateToMainTab() {
+        let mainTabBar = MainTabBarController()
+        mainTabBar.modalPresentationStyle = .fullScreen
+        present(mainTabBar, animated: true)
     }
 }
 
