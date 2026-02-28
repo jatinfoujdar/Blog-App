@@ -118,12 +118,37 @@ class ProfileViewController: UIViewController {
         setupUI()
         setupConstraints()
         setupActions()
+        
+        fetchProfileData()
     }
     
-    private func setupView(){
+    private func setupView() {
         view.backgroundColor = .systemBackground
         title = "🧍‍♂️Profile"
+        
+        navigationItem.rightBarButtonItem = UIBarButtonItem(
+            title: "Logout",
+            style: .plain,
+            target: self,
+            action: #selector(handleLogout)
+        )
     }
+
+    @objc private func handleLogout() {
+        SessionManager.shared.logout()
+        
+      
+        guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+              let window = windowScene.windows.first else { return }
+        
+        let loginVC = LoginViewController()
+        let navController = UINavigationController(rootViewController: loginVC)
+        
+        UIView.transition(with: window, duration: 0.3, options: .transitionCrossDissolve, animations: {
+            window.rootViewController = navController
+        }, completion: nil)
+    }
+
     
     private func setupUI(){
         view.addSubview(containerView)
@@ -183,6 +208,24 @@ class ProfileViewController: UIViewController {
         print(profile.socialLinks)
     }
     
+    private func fetchProfileData() {
+        APIService.shared.fetchProfile { [weak self] result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let profile):
+                    self?.nameValueLabel.text = profile.name // Read-only label
+                    self?.roleTextField.text = profile.role
+                    self?.githubTextField.text = profile.github
+                    self?.linkedinTextField.text = profile.linkedin
+                    self?.twitterTextField.text = profile.twitter
+                    self?.websiteTextField.text = profile.website
+                case .failure(let error):
+                    print("Failed to fetch profile: \(error)")
+                }
+            }
+        }
+    }
+
     
     private func createHorizontalStack(_ views: UIView...) -> UIStackView{
         let stack = UIStackView(arrangedSubviews: views)
