@@ -66,6 +66,12 @@ class SignUpViewController: UIViewController {
         return button
     }()
     
+    private let goToLoginButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.setTitle("Already have an account? Login", for: .normal)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        return button
+    }()
     
     
     override func viewDidLoad(){
@@ -90,6 +96,7 @@ class SignUpViewController: UIViewController {
         view.addSubview(emailTextField)
         view.addSubview(passwordTextField)
         view.addSubview(signupButton)
+        view.addSubview(goToLoginButton)
     }
 
     private func setupConstraints() {
@@ -121,13 +128,17 @@ class SignUpViewController: UIViewController {
             signupButton.topAnchor.constraint(equalTo: passwordTextField.bottomAnchor, constant: 30),
             signupButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             signupButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
-            signupButton.heightAnchor.constraint(equalToConstant: 50)
+            signupButton.heightAnchor.constraint(equalToConstant: 50),
+            
+            goToLoginButton.topAnchor.constraint(equalTo: signupButton.bottomAnchor, constant: 20),
+            goToLoginButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
         ])
     }
     
     
     private func setupActions(){
         signupButton.addTarget(self, action: #selector(handleSignup), for: .touchUpInside)
+        goToLoginButton.addTarget(self, action: #selector(goBackToLogin), for: .touchUpInside)
     }
     
     
@@ -151,7 +162,7 @@ class SignUpViewController: UIViewController {
                 case .success(let res):
                     if let token = res.token{
                         SessionManager.shared.saveToken(token)
-                        self.navigateToMainTab()
+                        self.presentMainApp()
                     }else{
                         self.showAlert(title: "Error", message: "Invalid server")
                     }
@@ -168,10 +179,27 @@ class SignUpViewController: UIViewController {
         present(alert, animated: true)
     }
     
-    private func navigateToMainTab() {
-        let mainTabBar = MainTabBarController()
-        mainTabBar.modalPresentationStyle = .fullScreen
-        present(mainTabBar, animated: true)
+      
+    @objc private func goBackToLogin() {
+        navigationController?.popViewController(animated: true)
     }
+    
+    private func presentMainApp() {
+        guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+              let window = windowScene.windows.first else { return }
+        
+        UIView.transition(
+            with: window,
+            duration: 0.3,
+            options: .transitionCrossDissolve,
+            animations: {
+                window.rootViewController = MainTabBarController()
+                window.makeKeyAndVisible()
+            },
+            completion: nil
+        )
+    }
+
+    
 }
 

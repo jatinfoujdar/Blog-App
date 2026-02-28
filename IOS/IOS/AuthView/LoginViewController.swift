@@ -57,6 +57,13 @@ class LoginViewController : UIViewController{
         return button
     }()
     
+    private let goToSignupButton: UIButton = {
+        
+        let button = UIButton()
+        button.setTitle("Don't have an account? Sign Up", for: .normal)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        return button
+    }()
     
     
     override func viewDidLoad(){
@@ -74,6 +81,7 @@ class LoginViewController : UIViewController{
         view.addSubview(emailTextField)
         view.addSubview(passwordTextField)
         view.addSubview(loginButton)
+        view.addSubview(goToSignupButton)
     }
     
     
@@ -107,12 +115,16 @@ class LoginViewController : UIViewController{
             loginButton.topAnchor.constraint(equalTo: passwordTextField.bottomAnchor, constant: 30),
             loginButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             loginButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
-            loginButton.heightAnchor.constraint(equalToConstant: 50)
+            loginButton.heightAnchor.constraint(equalToConstant: 50),
+            
+            goToSignupButton.topAnchor.constraint(equalTo: loginButton.bottomAnchor, constant: 20),
+            goToSignupButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
         ])
     }
     
     private func setupActions(){
         loginButton.addTarget(self, action: #selector(handleLogin), for: .touchUpInside)
+        goToSignupButton.addTarget(self, action: #selector(navigateToSignup), for: .touchUpInside)
     }
     
     @objc private func handleLogin(){
@@ -169,5 +181,10 @@ class LoginViewController : UIViewController{
         let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "OK", style: .default))
         present(alert, animated: true)
+    }
+    
+    @objc private func navigateToSignup(){
+        let signVC = SignUpViewController()
+        navigationController?.pushViewController(signVC, animated: true)
     }
 }
