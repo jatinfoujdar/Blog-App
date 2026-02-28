@@ -8,7 +8,7 @@
 import UIKit
 
 
-class loginViewController : UIViewController{
+class LoginViewController : UIViewController{
     
     
     private let titleLabel : UILabel = {
@@ -120,8 +120,9 @@ class loginViewController : UIViewController{
         
         guard let email = emailTextField.text, !email.isEmpty,
               let password = passwordTextField.text, !password.isEmpty else {
-              showAlert(title: "Error", message: "Please fill all fields")
-              return
+            showAlert(title: "Error", message: "Please fill all fields")
+            loginButton.isEnabled = true
+            return
         }
         
         let loginRequest = LoginRequest(email: email, password: password)
@@ -129,11 +130,13 @@ class loginViewController : UIViewController{
         APIService.shared.login(request: loginRequest){ result in
         
             DispatchQueue.main.async {
+                self.loginButton.isEnabled = true
+                
                 switch result {
                 case .success(let res):
                     if let token = res.token{
                         SessionManager.shared.saveToken(token)
-//                        self.
+                        self.presentMainApp()
                     }else{
                         self.showAlert(title: "Error", message: "Invaild server")
                     }
@@ -142,6 +145,24 @@ class loginViewController : UIViewController{
                 }
             }
         }
+    }
+    
+    
+    private func presentMainApp() {
+        guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+              let window = windowScene.windows.first else { return }
+        
+       
+        UIView.transition(
+            with: window,
+            duration: 0.3,
+            options: .transitionCrossDissolve,
+            animations: {
+                window.rootViewController = MainTabBarController()
+                window.makeKeyAndVisible()
+            },
+            completion: nil
+        )
     }
     
     private func showAlert(title: String, message: String){

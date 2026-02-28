@@ -72,7 +72,7 @@ class SignUpViewController: UIViewController {
         
         super.viewDidLoad()
         setupView()
-        SetupUI()
+        setupUI()
         setupConstraints()
         setupActions()
     }
@@ -83,7 +83,7 @@ class SignUpViewController: UIViewController {
     }
     
     
-    private func SetupUI(){
+    private func setupUI(){
         
         view.addSubview(titleLabel)
         view.addSubview(nameTextField)
@@ -138,8 +138,27 @@ class SignUpViewController: UIViewController {
         guard let name = nameTextField.text, !name.isEmpty,
               let email = emailTextField.text, !email.isEmpty,
               let password = passwordTextField.text, !password.isEmpty else{
-              showAlert(title: "error", message: "Please fill in all field")
-            return
+              showAlert(title: "Error", message: "Please fill in all fields")
+              return
+        }
+        
+        let signupRequest = SignupRequest(name: name, email: email, password: password)
+        
+        APIService.shared.signup(request: signupRequest){ result in
+            
+            DispatchQueue.main.async {
+                switch result{
+                case .success(let res):
+                    if let token = res.token{
+                        SessionManager.shared.saveToken(token)
+                        self.navigateToLogin()
+                    }else{
+                        self.showAlert(title: "Error", message: "Invalid server")
+                    }
+                case .failure(let error):
+                    self.showAlert(title: "Signup failed", message: error.localizedDescription)
+                }
+            }
         }
         
     }
@@ -149,5 +168,16 @@ class SignUpViewController: UIViewController {
         present(alert, animated: true)
     }
     
+    private func navigateToLogin(){
+        if let navigationController = self.navigationController{
+            let loginVC = LoginViewController()
+            navigationController.pushViewController(loginVC, animated: true)
+        }
+        else{
+            let loginVC = LoginViewController()
+            loginVC.modalPresentationStyle = .fullScreen
+            self.present(loginVC, animated: true)
+        }
+    }
 }
 
