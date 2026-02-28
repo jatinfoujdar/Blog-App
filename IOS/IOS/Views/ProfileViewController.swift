@@ -10,13 +10,15 @@ class ProfileViewController: UIViewController {
         return label
     }()
     
-    private let nameTextField: UITextField = {
-        let textField = UITextField()
-        textField.placeholder = "Enter your name"
-        textField.borderStyle = .roundedRect
-        textField.translatesAutoresizingMaskIntoConstraints = false
-        return textField
+    private let nameValueLabel: UILabel = {
+        let label = UILabel()
+        label.text = "Loading..."
+        label.font = UIFont.systemFont(ofSize: 16, weight: .medium)
+        label.textColor = .darkGray
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
     }()
+
     
     private let roleLabel: UILabel = {
         let label = UILabel()
@@ -128,7 +130,7 @@ class ProfileViewController: UIViewController {
         containerView.addSubview(scrollView)
         scrollView.addSubview(contentStackView)
         
-        let nameStack = createHorizontalStack(nameLabel, nameTextField)
+        let nameStack = createHorizontalStack(nameLabel, nameValueLabel)
         let roleStack = createHorizontalStack(roleLabel, roleTextField)
         
         contentStackView.addArrangedSubview(nameStack)
@@ -170,7 +172,7 @@ class ProfileViewController: UIViewController {
     
     @objc private func addTapped(){
         let profile = Profile(
-            name: nameTextField.text ?? "",
+            name: nameValueLabel.text ?? "",
             role: roleTextField.text ?? "",
             github: githubTextField.text ,
             linkedin: linkedinTextField.text ,

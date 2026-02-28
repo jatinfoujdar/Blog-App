@@ -194,5 +194,59 @@ class APIService {
         
         return req
     }
+    
+    
+    func fetchProfile(completion: @escaping(Result<Profile, Error>)-> Void ) {
+        
+        guard let url = URL(string: "\(baseURL)/profile") else{
+            completion(.failure(NetworkError.invalidURL))
+            return
+        }
+        
+        guard let request = authorizedRequest(url: url) else {
+            completion(.failure(NetworkError.serverError("User not logged In")))
+            return
+        }
+        
+        URLSession.shared.dataTask(with: request){ data ,res, error in
+            
+            if let error = error{
+                DispatchQueue.main.async{
+                    completion(.failure(error))
+                }
+                return
+            }
+            guard let httpResponse = res as? HTTPURLResponse else{
+                DispatchQueue.main.async{
+                    completion(.failure(NetworkError.serverError("Invaild response")))
+                }
+                return
+            }
+            guard(200...299).contains(httpResponse.statusCode) else{
+                DispatchQueue.main.async{
+                    completion(.failure(NetworkError.serverError("status code: \(httpResponse.statusCode)")))
+                }
+                return
+            }
+            guard let data = data else{
+                DispatchQueue.main.async {
+                    completion(.failure(NetworkError.noData))
+                }
+                return
+            }
+            do{
+                let decoder = JSONDecoder()
+                
+                decoder.keyDecodingStrategy = .convertFromSnakeCase
+                let profile = try decoder.decode(Profile.self, from: data)
+                DispatchQueue.main.async{
+                    completion(.success(profile))
+                }
+            }catch{
+                DispatchQueue.main.async{
+                    completion(.failure(NetworkError.decodingError))
+                }
+            }
+        }.resume()
+    }
 }
-
