@@ -21,7 +21,7 @@ class MainTabBarController : UITabBarController{
         let createViewController  = CreatePostViewController()
         
         homeViewController.tabBarItem = UITabBarItem(title: "Home", image: UIImage(systemName: "house"), tag: 0)
-        createViewController.tabBarItem = UITabBarItem(title: "Create", image: UIImage(systemName: "square.and.pencil"), tag: 1)
+        createViewController.tabBarItem = UITabBarItem(title: "Post", image: UIImage(systemName: "square.and.pencil"), tag: 1)
         profileViewController.tabBarItem = UITabBarItem(title: "Profile", image: UIImage(systemName: "person"), tag: 2)
       
         
