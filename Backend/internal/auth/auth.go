@@ -31,6 +31,12 @@ type Claims struct {
 	jwt.RegisteredClaims
 }
 
+type RegisterRequest struct {
+	Name     string `json:"name" binding:"required"`
+	Email    string `json:"email" binding:"required,email"`
+	Password string `json:"password" binding:"required,min=6"`
+}
+
 func GenerateJWT(email string) (string, error) {
 	claims := &Claims{
 		Email: email,
@@ -147,16 +153,33 @@ func (r *UserRepository) UpdateUser(email string, updateData map[string]interfac
 
 func RegisterHandler(repo *UserRepository) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var user model.User
-		if err := c.ShouldBindJSON(&user); err != nil {
+		var req RegisterRequest
+		if err := c.ShouldBindJSON(&req); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
+
+		user := model.User{
+			Name:     req.Name,
+			Email:    req.Email,
+			Password: req.Password,
+		}
+
 		if err := repo.CreateUser(&user); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
-		c.JSON(http.StatusCreated, gin.H{"message": "user registered successfully"})
+
+		token, err := GenerateJWT(user.Email)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "could not generate token"})
+			return
+		}
+
+		c.JSON(http.StatusCreated, gin.H{
+			"message": "user registered successfully",
+			"token":   token,
+		})
 	}
 }
 

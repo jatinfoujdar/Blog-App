@@ -10,7 +10,7 @@ type User struct {
 	ID        primitive.ObjectID `bson:"_id,omitempty" json:"id"`
 	Name      string             `bson:"name" json:"name" binding:"required"`
 	Email     string             `bson:"email" json:"email" binding:"required,email"`
-	Password  string             `bson:"password" json:"-" binding:"required,min=6"`
+	Password  string             `bson:"password" json:"password"`
 	Role      string             `bson:"role" json:"role"`
 	Github    string             `bson:"github" json:"github"`
 	Linkedin  string             `bson:"linkedin" json:"linkedin"`

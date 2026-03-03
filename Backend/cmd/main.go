@@ -6,13 +6,14 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/jatinfoujdar/Blog-App/internal/auth"
+	"github.com/jatinfoujdar/Blog-App/internal/db"
 	"github.com/jatinfoujdar/Blog-App/internal/middleware"
 	"github.com/jatinfoujdar/Blog-App/internal/posts"
 )
 
 func init() {
 	auth.LoadEnvVariable()
-	ConnectDB()
+	db.ConnectDB()
 }
 
 func main() {
@@ -27,14 +28,14 @@ func main() {
 	if dbName == "" {
 		dbName = "blog_app"
 	}
-	userCollection := Client.Database(dbName).Collection("users")
+	userCollection := db.Client.Database(dbName).Collection("users")
 	userRepo, err := auth.NewUserRepository(userCollection)
 	if err != nil {
 		panic(err)
 	}
 
 	// Posts initialization
-	postCollection := Client.Database(dbName).Collection("posts")
+	postCollection := db.Client.Database(dbName).Collection("posts")
 	postRepo := posts.NewPostRepository(postCollection)
 	postHandler := posts.NewPostHandler(postRepo)
 

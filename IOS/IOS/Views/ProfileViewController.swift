@@ -124,7 +124,7 @@ class ProfileViewController: UIViewController {
     
     private func setupView() {
         view.backgroundColor = .systemBackground
-        title = "🧍‍♂️Profile"
+        title = "Profile"
         
         navigationItem.rightBarButtonItem = UIBarButtonItem(
             title: "Logout",
@@ -203,9 +203,24 @@ class ProfileViewController: UIViewController {
             linkedin: linkedinTextField.text ,
             twitter: twitterTextField.text ,
             website: websiteTextField.text
-    )
-        print(profile)
-        print(profile.socialLinks)
+        )
+        
+        APIService.shared.updateProfile(profile: profile) { [weak self] result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let message):
+                    self?.showAlert(title: "Success", message: message)
+                case .failure(let error):
+                    self?.showAlert(title: "Error", message: error.localizedDescription)
+                }
+            }
+        }
+    }
+    
+    private func showAlert(title: String, message: String) {
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "OK", style: .default))
+        present(alert, animated: true)
     }
     
     private func fetchProfileData() {
