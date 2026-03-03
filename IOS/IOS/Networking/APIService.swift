@@ -249,5 +249,68 @@ class APIService {
             }
         }.resume()
     }
-
+    
+    
+    func createPost(request: CreatePostRequest,completion: @escaping (Result<String, Error>) -> Void) {
+        guard let url = URL(string: "\(baseURL)/posts") else {
+            completion(.failure(NetworkError.invalidURL))
+            return
+        }
+        
+        guard var urlRequest = authorizedRequest(url: url) else {
+            completion(.failure(NetworkError.serverError("User not logged in")))
+            return
+        }
+        
+        urlRequest.httpMethod = "POST"
+        
+        do {
+            urlRequest.httpBody = try JSONEncoder().encode(request)
+        } catch {
+            completion(.failure(error))
+            return
+        }
+        
+        URLSession.shared.dataTask(with: urlRequest) { data, response, error in
+            
+            if let error = error {
+                DispatchQueue.main.async {
+                    completion(.failure(error))
+                }
+                return
+            }
+            
+            guard let httpResponse = response as? HTTPURLResponse else {
+                DispatchQueue.main.async {
+                    completion(.failure(NetworkError.unknown))
+                }
+                return
+            }
+            
+            guard let data = data else {
+                DispatchQueue.main.async {
+                    completion(.failure(NetworkError.noData))
+                }
+                return
+            }
+            
+            if (200...299).contains(httpResponse.statusCode) {
+                do {
+                    let decoded = try JSONDecoder().decode(MessageResponse.self, from: data)
+                    DispatchQueue.main.async {
+                        completion(.success(decoded.message))
+                    }
+                } catch {
+                    DispatchQueue.main.async {
+                        completion(.failure(NetworkError.decodingError))
+                    }
+                }
+            } else {
+                DispatchQueue.main.async {
+                    completion(.failure(NetworkError.serverError("Failed to create post")))
+                }
+            }
+            
+        }.resume()
+    }
 }
