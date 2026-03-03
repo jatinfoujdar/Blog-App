@@ -45,3 +45,4 @@ func (r *PostRepository) GetAllPost() ([]*Post, error){
 
 	return posts, nil
 }
+
