@@ -59,8 +59,10 @@ class LoginViewController : UIViewController{
     
     private let goToSignupButton: UIButton = {
         
-        let button = UIButton()
+        let button = UIButton(type: .system)
         button.setTitle("Don't have an account? Sign Up", for: .normal)
+        button.setTitleColor(.systemBlue, for: .normal)   
+        button.titleLabel?.font = .systemFont(ofSize: 14)
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
