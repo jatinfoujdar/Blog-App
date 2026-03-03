@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/jatinfoujdar/Blog-App/internal/auth"
 	"github.com/jatinfoujdar/Blog-App/internal/middleware"
+	"github.com/jatinfoujdar/Blog-App/internal/posts"
 )
 
 func init() {
@@ -22,7 +23,6 @@ func main() {
 
 	r := gin.Default()
 
-	// Initialize Repository
 	dbName := os.Getenv("DB_NAME")
 	if dbName == "" {
 		dbName = "blog_app"
@@ -33,17 +33,20 @@ func main() {
 		panic(err)
 	}
 
+	// Posts initialization
+	postCollection := Client.Database(dbName).Collection("posts")
+	postRepo := posts.NewPostRepository(postCollection)
+	postHandler := posts.NewPostHandler(postRepo)
+
 	r.GET("/ping", func(c *gin.Context) {
 		c.JSON(200, gin.H{
 			"message": "pong",
 		})
 	})
 
-	// Auth Routes
 	r.POST("/signup", auth.RegisterHandler(userRepo))
 	r.POST("/login", auth.LoginHandler(userRepo))
 
-	// Protected Routes
 	protected := r.Group("/")
 	protected.Use(middleware.AuthMiddleware())
 	{
@@ -57,6 +60,9 @@ func main() {
 			c.JSON(200, user)
 		})
 		protected.PUT("/profile", auth.UpdateProfileHandler(userRepo))
+
+		protected.POST("/posts", postHandler.CreatePostHandler)
+		protected.GET("/posts", postHandler.GetPostsHandler)
 	}
 
 	r.Run(":" + port)

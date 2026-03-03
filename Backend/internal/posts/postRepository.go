@@ -26,7 +26,7 @@ func (r *PostRepository) CreatePost(post *Post) error{
 	return err
 }
 
-func (r *PostRepository) GetAllPost() ([]*Post, error){
+func (r *PostRepository) GetAllPosts() ([]*Post, error){
 	var posts []*Post
 
 	cursor, err := r.Collection.Find(context.Background(), bson.M{})
