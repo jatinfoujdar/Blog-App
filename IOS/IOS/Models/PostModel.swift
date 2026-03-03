@@ -8,13 +8,20 @@
 import Foundation
 
 
-struct PostModel : Codable, Identifiable {
-    
-    var id: String?
-    var title: String
-    var subtitle: String
-    var content: String
-    var authorEmail: String
-    var createdAt: Date?
-    var updatedAt: Date?
+struct Post: Codable {
+    let id: String?
+    let title: String
+    let subtitle: String
+    let content: String
+    let category: String
+    let authorEmail: String?
+    let createdAt: String?
 }
+
+struct CreatePostRequest: Encodable {
+    let title: String
+    let subtitle: String
+    let content: String
+    let category: String
+}
+
