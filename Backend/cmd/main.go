@@ -34,7 +34,7 @@ func main() {
 		panic(err)
 	}
 
-	// Posts initialization
+	
 	postCollection := db.Client.Database(dbName).Collection("posts")
 	postRepo := posts.NewPostRepository(postCollection)
 	postHandler := posts.NewPostHandler(postRepo)
