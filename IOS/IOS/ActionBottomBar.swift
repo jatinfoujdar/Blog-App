@@ -12,7 +12,7 @@ class ActionBottomBar: UIView{
     let settingButton = UIButton()
     
     override init(frame: CGRect) {
-        super.frame = frame
+        super.init(frame: frame)
         setupUI()
     }
     required init?(coder: NSCoder) {
