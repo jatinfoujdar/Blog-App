@@ -9,9 +9,12 @@ import UIKit
 
 class MainTabBarController : UITabBarController{
     
+    let actionBar = ActionBottomBar()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         SetupTabBar()
+        setupActionBar()
     }
     
     private func SetupTabBar(){
@@ -26,14 +29,38 @@ class MainTabBarController : UITabBarController{
       
         
         
-      viewControllers = [
-       UINavigationController(rootViewController: homeViewController),
-       UINavigationController(rootViewController: createViewController),
-       UINavigationController(rootViewController: profileViewController)
-      ]
+      
+      let homeNav = UINavigationController(rootViewController: homeViewController)
+      let createNav = UINavigationController(rootViewController: createViewController)
+      let profileNav = UINavigationController(rootViewController: profileViewController)
+      
+        
+        homeNav.hidesBarsOnSwipe = true
+        
+        viewControllers = [homeNav, createNav, profileNav]
         
         tabBar.backgroundColor = .white
         tabBar.tintColor = .black
         tabBar.unselectedItemTintColor = .gray
+    }
+    func tabBarController(_ tabBarController: UITabBarController, didSelect viewController: UIViewController) {
+        guard let index = viewControllers?.firstIndex(of: viewController),
+              let tabBarButton = tabBar.subviews[index + 1] as? UIControl else { return }
+    }
+    
+    func setupActionBar() {
+
+        view.addSubview(actionBar)
+
+        actionBar.translatesAutoresizingMaskIntoConstraints = false
+
+        NSLayoutConstraint.activate([
+            actionBar.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            actionBar.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            actionBar.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+            actionBar.heightAnchor.constraint(equalToConstant: 60)
+        ])
+
+        actionBar.isHidden = true
     }
 }
