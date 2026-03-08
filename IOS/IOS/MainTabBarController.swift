@@ -9,12 +9,12 @@ import UIKit
 
 class MainTabBarController : UITabBarController{
     
-    let actionBar = ActionBottomBar()
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
         SetupTabBar()
-        setupActionBar()
+
     }
     
     private func SetupTabBar(){
@@ -22,18 +22,20 @@ class MainTabBarController : UITabBarController{
         let profileViewController = ProfileViewController()
         let homeViewController = HomeViewController()
         let createViewController  = CreatePostViewController()
+        let remindersViewController = ReminderListViewController()
+        
         
         homeViewController.tabBarItem = UITabBarItem(title: "Home", image: UIImage(systemName: "house"), tag: 0)
         createViewController.tabBarItem = UITabBarItem(title: "Post", image: UIImage(systemName: "square.and.pencil"), tag: 1)
-        profileViewController.tabBarItem = UITabBarItem(title: "Profile", image: UIImage(systemName: "person"), tag: 2)
-      
+        remindersViewController.tabBarItem = UITabBarItem(title: "Tasks", image: UIImage(systemName: "list.bullet"), tag: 2)
+        profileViewController.tabBarItem = UITabBarItem(title: "Profile", image: UIImage(systemName: "person"), tag: 3)
         
         
-      
-      let homeNav = UINavigationController(rootViewController: homeViewController)
-      let createNav = UINavigationController(rootViewController: createViewController)
-      let profileNav = UINavigationController(rootViewController: profileViewController)
-      
+                
+        let homeNav = UINavigationController(rootViewController: homeViewController)
+        let createNav = UINavigationController(rootViewController: createViewController)
+        let profileNav = UINavigationController(rootViewController: profileViewController)
+        
         
         homeNav.hidesBarsOnSwipe = true
         
@@ -48,19 +50,4 @@ class MainTabBarController : UITabBarController{
               let tabBarButton = tabBar.subviews[index + 1] as? UIControl else { return }
     }
     
-    func setupActionBar() {
-
-        view.addSubview(actionBar)
-
-        actionBar.translatesAutoresizingMaskIntoConstraints = false
-
-        NSLayoutConstraint.activate([
-            actionBar.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            actionBar.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            actionBar.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
-            actionBar.heightAnchor.constraint(equalToConstant: 60)
-        ])
-
-        actionBar.isHidden = true
-    }
 }
