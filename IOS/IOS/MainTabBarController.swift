@@ -31,23 +31,21 @@ class MainTabBarController : UITabBarController{
         profileViewController.tabBarItem = UITabBarItem(title: "Profile", image: UIImage(systemName: "person"), tag: 3)
         
         
-                
         let homeNav = UINavigationController(rootViewController: homeViewController)
         let createNav = UINavigationController(rootViewController: createViewController)
+        let remindersNav = UINavigationController(rootViewController: remindersViewController)
         let profileNav = UINavigationController(rootViewController: profileViewController)
         
         
         homeNav.hidesBarsOnSwipe = true
         
-        viewControllers = [homeNav, createNav, profileNav]
+        viewControllers = [homeNav, createNav, remindersNav, profileNav]
         
         tabBar.backgroundColor = .white
         tabBar.tintColor = .black
         tabBar.unselectedItemTintColor = .gray
     }
-    func tabBarController(_ tabBarController: UITabBarController, didSelect viewController: UIViewController) {
-        guard let index = viewControllers?.firstIndex(of: viewController),
-              let tabBarButton = tabBar.subviews[index + 1] as? UIControl else { return }
-    }
+    
+ 
     
 }

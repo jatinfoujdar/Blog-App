@@ -7,7 +7,87 @@
 
 import UIKit
 
-class ReminderListViewController: UICollectionViewController{
+class ReminderListViewController: UIViewController{
     
-
+    private let titleLabel : UILabel = {
+        let lb = UILabel()
+        lb.text = "My Day"
+        lb.textColor = .black
+        lb.font = UIFont.systemFont(ofSize: 20, weight: .bold)
+        return lb
+    }()
+    
+    private let taskCard: UIView = {
+        let view = UIView()
+        view.backgroundColor = .systemGray5
+        view.layer.cornerRadius = 10
+        return view
+    }()
+    
+    private let taskLabel : UILabel = {
+        let tl = UILabel()
+        tl.text = "Buy Milk"
+        tl.font = UIFont.systemFont(ofSize: 16, weight: .bold)
+        tl.textColor = .gray
+        return tl
+    }()
+    
+    private let checkButton : UIButton = {
+        let btn = UIButton(type: .system)
+        btn.setTitle("✓", for: .normal)
+        btn.titleLabel?.font = UIFont.systemFont(ofSize: 20, weight: .bold)
+        return btn
+    }()
+    
+ 
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        view.backgroundColor = .white
+        setupUI()
+        setupConstraints()
+        
+        checkButton.addTarget(self, action: #selector(tappedButton), for: .touchUpInside)
+    }
+    
+    private func setupUI(){
+        view.addSubview(titleLabel)
+        view.addSubview(taskCard)
+        
+        taskCard.addSubview(taskLabel)
+        taskCard.addSubview(checkButton)
+    }
+    
+    private func setupConstraints() {
+        
+        titleLabel.translatesAutoresizingMaskIntoConstraints = false
+        taskCard.translatesAutoresizingMaskIntoConstraints = false
+        taskLabel.translatesAutoresizingMaskIntoConstraints = false
+        checkButton.translatesAutoresizingMaskIntoConstraints = false
+        
+        NSLayoutConstraint.activate([
+            
+           
+            titleLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
+            titleLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            
+            
+            taskCard.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            taskCard.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            taskCard.widthAnchor.constraint(equalToConstant: 220),
+            taskCard.heightAnchor.constraint(equalToConstant: 100),
+            
+           
+            taskLabel.centerYAnchor.constraint(equalTo: taskCard.centerYAnchor),
+            taskLabel.leadingAnchor.constraint(equalTo: taskCard.leadingAnchor, constant: 20),
+            
+           
+            checkButton.centerYAnchor.constraint(equalTo: taskCard.centerYAnchor),
+            checkButton.trailingAnchor.constraint(equalTo: taskCard.trailingAnchor, constant: -20)
+        ])
+    }
+    
+    @objc func tappedButton(){
+        taskLabel.textColor = .gray
+        taskLabel.font = UIFont.italicSystemFont(ofSize: 18)
+    }
 }
