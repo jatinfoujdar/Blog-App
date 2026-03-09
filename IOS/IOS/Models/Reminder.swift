@@ -7,5 +7,9 @@
 
 import Foundation
 
-
+struct Task: Codable {
+    let id: UUID
+    var title: String
+    var isCompleted: Bool
+}
 
