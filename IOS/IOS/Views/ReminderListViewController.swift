@@ -9,6 +9,8 @@ import UIKit
 
 class ReminderListViewController: UIViewController, UITextFieldDelegate{
     
+    var tasks: [Task] = []
+    
     private let titleLabel : UILabel = {
         let lb = UILabel()
         lb.text = "My Day"
@@ -120,8 +122,16 @@ class ReminderListViewController: UIViewController, UITextFieldDelegate{
     }
     
     @objc func tappedButton(){
-        taskLabel.textColor = .gray
-        taskLabel.font = UIFont.italicSystemFont(ofSize: 18)
+        guard !tasks.isEmpty else {return}
+        
+        tasks[0].isCompleted.toggle()
+        if tasks[0].isCompleted{
+            taskLabel.textColor = .gray
+            taskLabel.font = UIFont.italicSystemFont(ofSize: 18)
+        }else{
+            taskLabel.textColor = .black
+            taskLabel.font = UIFont.systemFont(ofSize: 18, weight: .bold)
+        }
     }
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
@@ -130,6 +140,21 @@ class ReminderListViewController: UIViewController, UITextFieldDelegate{
     }
     
     @objc func addTask() {
-        print(inputField.text ?? "")
+        guard let text = inputField.text, !text.isEmpty else {return}
+        
+        let newTask = Task(
+            id: UUID(),
+            title: text,
+            isCompleted: false
+        )
+        tasks.append(newTask)
+        
+        taskLabel.text = text
+        taskLabel.textColor = .black
+        taskLabel.font = UIFont.systemFont(ofSize: 18, weight: .bold)
+        
+        inputField.text = ""
+        
+//        print(inputField.text ?? "")
     }
 }
