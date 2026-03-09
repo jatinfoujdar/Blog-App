@@ -7,7 +7,7 @@
 
 import UIKit
 
-class ReminderListViewController: UIViewController{
+class ReminderListViewController: UIViewController, UITextFieldDelegate{
     
     private let titleLabel : UILabel = {
         let lb = UILabel()
@@ -32,10 +32,25 @@ class ReminderListViewController: UIViewController{
         return tl
     }()
     
-    private let checkButton : UIButton = {
+    private let checkButton: UIButton = {
         let btn = UIButton(type: .system)
-        btn.setTitle("✓", for: .normal)
-        btn.titleLabel?.font = UIFont.systemFont(ofSize: 20, weight: .bold)
+        let image = UIImage(systemName: "checkmark")
+        btn.setImage(image, for: .normal)
+        btn.tintColor = .black
+        return btn
+    }()
+    
+    private let inputField: UITextField = {
+        let tf = UITextField()
+        tf.placeholder = "New Task"
+        tf.borderStyle = .roundedRect
+        return tf
+    }()
+    
+    private let addButton: UIButton = {
+        let btn = UIButton()
+        btn.setTitle("Add", for: .normal)
+        btn.tintColor = .blue
         return btn
     }()
     
@@ -46,7 +61,10 @@ class ReminderListViewController: UIViewController{
         setupUI()
         setupConstraints()
         
+        inputField.delegate = self
+        
         checkButton.addTarget(self, action: #selector(tappedButton), for: .touchUpInside)
+        addButton.addTarget(self, action: #selector(addTask), for: .touchUpInside)
     }
     
     private func setupUI(){
@@ -55,6 +73,9 @@ class ReminderListViewController: UIViewController{
         
         taskCard.addSubview(taskLabel)
         taskCard.addSubview(checkButton)
+        
+        view.addSubview(inputField)
+        view.addSubview(addButton)
     }
     
     private func setupConstraints() {
@@ -63,6 +84,9 @@ class ReminderListViewController: UIViewController{
         taskCard.translatesAutoresizingMaskIntoConstraints = false
         taskLabel.translatesAutoresizingMaskIntoConstraints = false
         checkButton.translatesAutoresizingMaskIntoConstraints = false
+        
+        inputField.translatesAutoresizingMaskIntoConstraints = false
+        addButton.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
             
@@ -82,12 +106,30 @@ class ReminderListViewController: UIViewController{
             
            
             checkButton.centerYAnchor.constraint(equalTo: taskCard.centerYAnchor),
-            checkButton.trailingAnchor.constraint(equalTo: taskCard.trailingAnchor, constant: -20)
+            checkButton.trailingAnchor.constraint(equalTo: taskCard.trailingAnchor, constant: -20),
+            
+            inputField.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+            inputField.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -20),
+            inputField.trailingAnchor.constraint(equalTo: addButton.leadingAnchor, constant: -10),
+            inputField.heightAnchor.constraint(equalToConstant: 40),
+
+            addButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+            addButton.centerYAnchor.constraint(equalTo: inputField.centerYAnchor),
+            addButton.widthAnchor.constraint(equalToConstant: 60)
         ])
     }
     
     @objc func tappedButton(){
         taskLabel.textColor = .gray
         taskLabel.font = UIFont.italicSystemFont(ofSize: 18)
+    }
+    
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        inputField.resignFirstResponder()
+        return true
+    }
+    
+    @objc func addTask() {
+        print(inputField.text ?? "")
     }
 }
