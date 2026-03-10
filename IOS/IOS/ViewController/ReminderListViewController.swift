@@ -54,13 +54,15 @@ class ReminderListViewController: UIViewController, UITableViewDataSource, UITab
            super.viewDidLoad()
            view.backgroundColor = .white
     
-        
+           tasks = Task.load()
            setupInputStack()
            setupTableView()
            setupConstraints()
            
            inputField.delegate = self
            addButton.addTarget(self, action: #selector(addTask), for: .touchUpInside)
+        
+          
        }
     
     
@@ -84,6 +86,8 @@ class ReminderListViewController: UIViewController, UITableViewDataSource, UITab
         tableView.translatesAutoresizingMaskIntoConstraints = false
         inputStack.translatesAutoresizingMaskIntoConstraints = false
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
+        tableView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 10)
+
         
         NSLayoutConstraint.activate([
             titleLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 10),
@@ -116,6 +120,7 @@ class ReminderListViewController: UIViewController, UITableViewDataSource, UITab
             isCompleted: false
         )
         tasks.append(newTask)
+        Task.save(tasks)
         tableView.reloadData()
         inputField.text = ""
     }
@@ -125,17 +130,39 @@ class ReminderListViewController: UIViewController, UITableViewDataSource, UITab
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: TaskCell.identifier, for: indexPath) as? TaskCell else{
+        
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: TaskCell.identifier, for: indexPath) as? TaskCell else {
             return UITableViewCell()
         }
+
         let task = tasks[indexPath.row]
         cell.configure(with: task)
+        
+        cell.onCompleteTap = { [weak self] in
+            guard let self = self else { return }
+
+            self.tasks[indexPath.row].isCompleted.toggle()
+
+            self.tableView.reloadRows(at: [indexPath], with: .automatic)
+
+            Task.save(self.tasks)
+        }
+
         return cell
     }
+    
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         addTask()
         inputField.resignFirstResponder()
         return true
+    }
+    
+    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath){
+        if editingStyle == .delete{
+            tasks.remove(at: indexPath.row)
+            tableView.deleteRows(at: [indexPath], with: .fade)
+            Task.save(tasks)
+        }
     }
 }

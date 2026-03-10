@@ -11,6 +11,8 @@ class TaskCell : UITableViewCell {
     
     static let identifier = "TaskCell"
     
+    var onCompleteTap: (() -> Void)?
+    
     private let titleLabel: UILabel = {
         let label = UILabel()
         label.font = .preferredFont(forTextStyle: .body)
@@ -36,9 +38,11 @@ class TaskCell : UITableViewCell {
     }
     
     private func setupUI() {
-           contentView.addSubview(titleLabel)
-           contentView.addSubview(completeButton)
-       }
+        contentView.addSubview(titleLabel)
+        contentView.addSubview(completeButton)
+        completeButton.addTarget(self, action: #selector(didTapComplete), for: .touchUpInside)
+        
+    }
        
     private func setupConstraints() {
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
@@ -64,5 +68,9 @@ class TaskCell : UITableViewCell {
         } else {
             titleLabel.textColor = .black
         }
+    }
+    
+    @objc private func didTapComplete() {
+        onCompleteTap?()
     }
 }
