@@ -19,28 +19,41 @@ class ReminderListViewController: UIViewController, UITextFieldDelegate{
         return lb
     }()
     
-    private let taskCard: UIView = {
-        let view = UIView()
-        view.backgroundColor = .systemGray5
-        view.layer.cornerRadius = 10
-        return view
+    private let taskStack: UIStackView = {
+        let sv = UIStackView()
+        sv.axis = .vertical
+        sv.spacing = 10
+        sv.alignment = .fill
+        sv.distribution = .fill
+        return sv
     }()
     
-    private let taskLabel : UILabel = {
-        let tl = UILabel()
-        tl.text = "Buy Milk"
-        tl.font = UIFont.systemFont(ofSize: 16, weight: .bold)
-        tl.textColor = .gray
-        return tl
+    private let inputStack: UIStackView = {
+        let sv = UIStackView()
+        sv.axis = .horizontal
+        sv.spacing = 10
+        sv.alignment = .fill
+        sv.distribution = .fill
+        return sv
     }()
     
-    private let checkButton: UIButton = {
-        let btn = UIButton(type: .system)
-        let image = UIImage(systemName: "checkmark")
-        btn.setImage(image, for: .normal)
-        btn.tintColor = .black
-        return btn
+    private let mainStack: UIStackView = {
+        let sv = UIStackView()
+        sv.axis = .vertical
+        sv.spacing = 10
+        sv.alignment = .fill
+        sv.distribution = .fill
+        return sv
     }()
+    
+    private let verticalStack: UIStackView = {
+           let sv = UIStackView()
+           sv.axis = .vertical
+           sv.spacing = 15
+           sv.alignment = .fill
+           sv.distribution = .fill
+           return sv
+       }()
     
     private let inputField: UITextField = {
         let tf = UITextField()
@@ -50,9 +63,11 @@ class ReminderListViewController: UIViewController, UITextFieldDelegate{
     }()
     
     private let addButton: UIButton = {
-        let btn = UIButton()
+        let btn = UIButton(type: .system)
         btn.setTitle("Add", for: .normal)
-        btn.tintColor = .blue
+        btn.setTitleColor(.white, for: .normal)
+        btn.backgroundColor = .systemBlue
+        btn.layer.cornerRadius = 8
         return btn
     }()
     
@@ -61,100 +76,76 @@ class ReminderListViewController: UIViewController, UITextFieldDelegate{
         super.viewDidLoad()
         view.backgroundColor = .white
         setupUI()
-        setupConstraints()
-        
         inputField.delegate = self
-        
-        checkButton.addTarget(self, action: #selector(tappedButton), for: .touchUpInside)
         addButton.addTarget(self, action: #selector(addTask), for: .touchUpInside)
     }
     
     private func setupUI(){
-        view.addSubview(titleLabel)
-        view.addSubview(taskCard)
         
-        taskCard.addSubview(taskLabel)
-        taskCard.addSubview(checkButton)
+        view.addSubview(verticalStack)
         
-        view.addSubview(inputField)
-        view.addSubview(addButton)
-    }
-    
-    private func setupConstraints() {
+        inputStack.addArrangedSubview(inputField)
+        inputStack.addArrangedSubview(addButton)
         
-        titleLabel.translatesAutoresizingMaskIntoConstraints = false
-        taskCard.translatesAutoresizingMaskIntoConstraints = false
-        taskLabel.translatesAutoresizingMaskIntoConstraints = false
-        checkButton.translatesAutoresizingMaskIntoConstraints = false
+        let taskCard = createTaskCard(title: "Buy Milk")
+        verticalStack.addArrangedSubview(titleLabel)
+        verticalStack.addArrangedSubview(taskCard)
+        verticalStack.addArrangedSubview(inputStack)
         
-        inputField.translatesAutoresizingMaskIntoConstraints = false
-        addButton.translatesAutoresizingMaskIntoConstraints = false
+       
+        
+        
+        verticalStack.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
-            
-           
-            titleLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
-            titleLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            
-            
-            taskCard.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            taskCard.centerYAnchor.constraint(equalTo: view.centerYAnchor),
-            taskCard.widthAnchor.constraint(equalToConstant: 220),
-            taskCard.heightAnchor.constraint(equalToConstant: 100),
-            
-           
-            taskLabel.centerYAnchor.constraint(equalTo: taskCard.centerYAnchor),
-            taskLabel.leadingAnchor.constraint(equalTo: taskCard.leadingAnchor, constant: 20),
-            
-           
-            checkButton.centerYAnchor.constraint(equalTo: taskCard.centerYAnchor),
-            checkButton.trailingAnchor.constraint(equalTo: taskCard.trailingAnchor, constant: -20),
-            
-            inputField.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
-            inputField.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -20),
-            inputField.trailingAnchor.constraint(equalTo: addButton.leadingAnchor, constant: -10),
-            inputField.heightAnchor.constraint(equalToConstant: 40),
-
-            addButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
-            addButton.centerYAnchor.constraint(equalTo: inputField.centerYAnchor),
-            addButton.widthAnchor.constraint(equalToConstant: 60)
+            verticalStack.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
+            verticalStack.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+            verticalStack.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+            verticalStack.bottomAnchor.constraint(lessThanOrEqualTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -20)
         ])
     }
     
-    @objc func tappedButton(){
-        guard !tasks.isEmpty else {return}
+    private func createTaskCard(title: String) -> UIView {
+        let card = UIView()
+        card.backgroundColor = .systemGray5
+        card.layer.cornerRadius = 10
         
-        tasks[0].isCompleted.toggle()
-        if tasks[0].isCompleted{
-            taskLabel.textColor = .gray
-            taskLabel.font = UIFont.italicSystemFont(ofSize: 18)
-        }else{
-            taskLabel.textColor = .black
-            taskLabel.font = UIFont.systemFont(ofSize: 18, weight: .bold)
-        }
+        let label = UILabel()
+        label.text = title
+        label.font = UIFont.systemFont(ofSize: 16, weight: .bold)
+        
+        let checkButton = UIButton(type: .system)
+        checkButton.setImage(UIImage(systemName: "circle"), for: .normal)
+        checkButton.tintColor = .black
+        
+        let hStack = UIStackView(arrangedSubviews: [label, checkButton])
+        hStack.axis = .horizontal
+        hStack.spacing = 10
+        hStack.alignment = .center
+        hStack.distribution = .fill
+        
+        card.addSubview(hStack)
+        hStack.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            hStack.topAnchor.constraint(equalTo: card.topAnchor, constant: 10),
+            hStack.bottomAnchor.constraint(equalTo: card.bottomAnchor, constant: -10),
+            hStack.leadingAnchor.constraint(equalTo: card.leadingAnchor, constant: 10),
+            hStack.trailingAnchor.constraint(equalTo: card.trailingAnchor, constant: -10)
+        ])
+        
+        return card
     }
     
-    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        inputField.resignFirstResponder()
-        return true
-    }
     
     @objc func addTask() {
-        guard let text = inputField.text, !text.isEmpty else {return}
-        
-        let newTask = Task(
-            id: UUID(),
-            title: text,
-            isCompleted: false
-        )
-        tasks.append(newTask)
-        
-        taskLabel.text = text
-        taskLabel.textColor = .black
-        taskLabel.font = UIFont.systemFont(ofSize: 18, weight: .bold)
-        
-        inputField.text = ""
-        
-//        print(inputField.text ?? "")
-    }
+           guard let text = inputField.text, !text.isEmpty else { return }
+           let newCard = createTaskCard(title: text)
+           verticalStack.insertArrangedSubview(newCard, at: verticalStack.arrangedSubviews.count - 1)
+           inputField.text = ""
+       }
+
+       func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+           inputField.resignFirstResponder()
+           return true
+       }
 }
