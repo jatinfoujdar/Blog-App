@@ -9,6 +9,7 @@ import (
 	"github.com/jatinfoujdar/Blog-App/internal/db"
 	"github.com/jatinfoujdar/Blog-App/internal/middleware"
 	"github.com/jatinfoujdar/Blog-App/internal/posts"
+	"github.com/jatinfoujdar/Blog-App/internal/tasks"
 )
 
 func init() {
@@ -34,10 +35,13 @@ func main() {
 		panic(err)
 	}
 
-	
 	postCollection := db.Client.Database(dbName).Collection("posts")
 	postRepo := posts.NewPostRepository(postCollection)
 	postHandler := posts.NewPostHandler(postRepo)
+
+	taskCollection := db.Client.Database(dbName).Collection("tasks")
+	taskRepo := tasks.NewTaskRepository(taskCollection)
+	taskHandler := tasks.NewTaskHandler(taskRepo)
 
 	r.GET("/ping", func(c *gin.Context) {
 		c.JSON(200, gin.H{
@@ -64,6 +68,11 @@ func main() {
 
 		protected.POST("/posts", postHandler.CreatePostHandler)
 		protected.GET("/posts", postHandler.GetPostsHandler)
+
+		protected.GET("/tasks", taskHandler.GetTasksHandler)
+		protected.POST("/tasks", taskHandler.CreateTaskHandler)
+		protected.PUT("/tasks/:id", taskHandler.ToggleTaskHandler)
+		protected.DELETE("/tasks/:id", taskHandler.DeleteTaskHandler)
 	}
 
 	r.Run(":" + port)
