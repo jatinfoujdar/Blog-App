@@ -10,6 +10,8 @@ import (
 	"github.com/jatinfoujdar/Blog-App/internal/middleware"
 	"github.com/jatinfoujdar/Blog-App/internal/posts"
 	"github.com/jatinfoujdar/Blog-App/internal/tasks"
+	"github.com/jatinfoujdar/Blog-App/internal/portfolio"
+	"github.com/jatinfoujdar/Blog-App/internal/kyc"
 )
 
 func init() {
@@ -43,6 +45,12 @@ func main() {
 	taskRepo := tasks.NewTaskRepository(taskCollection)
 	taskHandler := tasks.NewTaskHandler(taskRepo)
 
+	portfolioRepo := portfolio.NewRepository(db.Client.Database(dbName))
+	portfolioHandler := portfolio.NewHandler(portfolioRepo)
+
+	kycRepo := kyc.NewRepository(db.Client.Database(dbName))
+	kycHandler := kyc.NewHandler(kycRepo)
+
 	r.GET("/ping", func(c *gin.Context) {
 		c.JSON(200, gin.H{
 			"message": "pong",
@@ -73,6 +81,15 @@ func main() {
 		protected.POST("/tasks", taskHandler.CreateTaskHandler)
 		protected.PUT("/tasks/:id", taskHandler.ToggleTaskHandler)
 		protected.DELETE("/tasks/:id", taskHandler.DeleteTaskHandler)
+
+		protected.GET("/portfolio", portfolioHandler.GetPortfolioHandler)
+		protected.POST("/trading/buy", portfolioHandler.BuyStockHandler)
+		protected.POST("/trading/sell", portfolioHandler.SellStockHandler)
+		protected.POST("/balance/add", portfolioHandler.AddBalanceHandler)
+
+		protected.POST("/kyc/submit", kycHandler.SubmitKYCHandler)
+		protected.GET("/kyc/status", kycHandler.GetKYCStatusHandler)
+		protected.POST("/kyc/admin/verify", kycHandler.AdminVerifyKYCHandler) // Test endpoint
 	}
 
 	r.Run(":" + port)

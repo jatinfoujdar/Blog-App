@@ -16,6 +16,9 @@ type User struct {
 	Linkedin  string             `bson:"linkedin" json:"linkedin"`
 	Twitter   string             `bson:"twitter" json:"twitter"`
 	Website   string             `bson:"website" json:"website"`
+	Balance   float64            `bson:"balance" json:"balance"`
+	KYCStatus string             `bson:"kycStatus" json:"kycStatus"` // unverified, pending, verified
+	PAN       string             `bson:"pan" json:"pan"`
 	CreatedAt time.Time          `bson:"created_at" json:"created_at"`
 	UpdatedAt time.Time          `bson:"updated_at" json:"updated_at"`
 }

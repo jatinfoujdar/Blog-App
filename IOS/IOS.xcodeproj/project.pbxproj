@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		59344BAC2F61DB7400625362 /* FabBar in Frameworks */ = {isa = PBXBuildFile; productRef = 59344BAB2F61DB7400625362 /* FabBar */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		59FEBBF02F40EC360087157C /* IOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = IOS.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -36,6 +40,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				59344BAC2F61DB7400625362 /* FabBar in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -78,6 +83,7 @@
 			);
 			name = IOS;
 			packageProductDependencies = (
+				59344BAB2F61DB7400625362 /* FabBar */,
 			);
 			productName = IOS;
 			productReference = 59FEBBF02F40EC360087157C /* IOS.app */;
@@ -107,6 +113,9 @@
 			);
 			mainGroup = 59FEBBE72F40EC360087157C;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				59344BAA2F61DB7400625362 /* XCRemoteSwiftPackageReference "FabBar" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 59FEBBF12F40EC360087157C /* Products */;
 			projectDirPath = "";
@@ -343,6 +352,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		59344BAA2F61DB7400625362 /* XCRemoteSwiftPackageReference "FabBar" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/ryanashcraft/FabBar.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.1.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		59344BAB2F61DB7400625362 /* FabBar */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 59344BAA2F61DB7400625362 /* XCRemoteSwiftPackageReference "FabBar" */;
+			productName = FabBar;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 59FEBBE82F40EC360087157C /* Project object */;
 }
